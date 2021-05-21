@@ -1,0 +1,187 @@
+// Input: A combination of binary & "#" chars
+// Output: Accepts if format satisfies "u#v", with both "u" & "v" as natural numbers and "v" as the successor of "u"
+// Example: Accepts "0#1", "1#10" / Rejects "0#0", "1#0"
+
+// --------- States --------------------------------------------------------------|
+// qStart -> Initial state (check if first word is valid)
+// qBase -> Checks if number is 0
+// qNext -> First number is valid, check second
+// qMiddle -> Middle of the input (with #)
+// qSecond -> Check if second word is valid
+// qReset -> Go back to the first word
+// qAdd -> Increase the first word by 1
+// qCarry -> Adjust carry-over digits when adding
+// qCheck -> Start checking if both words are equal
+// qR0/qCheckR0 -> Check the first 0 in the second word
+// qR1/qCheckR1 -> Check the first 1 in the second word
+// qL0/qCheckL0 -> Check the first 0 in the first word
+// qL1/qCheckL1 -> Check the first 1 in the first word
+// qReadL -> Read the next digit from the first word
+// qReadR -> Read the next digit from the second word
+// qFinishL / qFinishR -> Check if both words were equal and finish the program
+// qGood -> Accepted state
+
+name: Successor
+init: qStart
+accept: qGood
+
+// Check if left word is valid
+
+qBase,#
+qMiddle,#,>
+
+qStart,1
+qNext,1,>
+
+qStart,0
+qBase,0,>
+
+// Check if right word is valid
+
+qNext,0
+qNext,0,>
+
+qNext,1
+qNext,1,>
+
+qNext,#
+qMiddle,#,>
+
+qMiddle,1
+qSecond,1,>
+
+qSecond,0
+qSecond,0,>
+
+qSecond,1
+qSecond,1,>
+
+// Go back to the first word and increase it by 1 (from right to left)
+
+qSecond,_
+qReset,_,<
+
+qReset,0
+qReset,0,<
+
+qReset,1
+qReset,1,<
+
+qReset,#
+qAdd,#,<
+
+qAdd,1
+qAdd,1,<
+
+qAdd,0
+qCarry,1,>
+
+qAdd,_
+qCarry,1,>
+
+qCarry,0
+qCarry,0,>
+
+qCarry,1
+qCarry,0,>
+
+// Check digit by digit if both are equal (writing # for the ones already checked)
+
+qCarry,#
+qCheck,#,>
+
+qCheck,#
+qCheck,#,>
+
+qCheck,1
+qL1,#,<
+
+qL0,#
+qL0,#,<
+
+qL0,0
+qL0,0,<
+
+qL0,1
+qL0,1,<
+
+qL0,_
+qCheckL0,_,>
+
+qL1,#
+qL1,#,<
+
+qL1,0
+qL1,0,<
+
+qL1,1
+qL1,1,<
+
+qL1,_
+qCheckL1,_,>
+
+qCheckL0,0
+qReadL,_,>
+
+qCheckL1,1
+qReadL,_,>
+
+qReadL,0
+qR0,_,>
+
+qReadL,1
+qR1,_,>
+
+qReadL,#
+qFinishR,#,>
+
+qFinishR,#
+qFinishR,#,>
+
+qFinishR,_
+qGood,_,-
+
+qR0,#
+qCheckR0,#,>
+
+qR0,0
+qR0,0,>
+
+qR0,1
+qR0,1,>
+
+qR1,#
+qCheckR1,#,>
+
+qR1,0
+qR1,0,>
+
+qR1,1
+qR1,1,>
+
+qCheckR0,#
+qCheckR0,#,>
+
+qCheckR0,0
+qReadR,#,>
+
+qCheckR1,#
+qCheckR1,#,>
+
+qCheckR1,1
+qReadR,#,>
+
+qReadR,0
+qL0,#,<
+
+qReadR,1
+qL1,#,<
+
+qReadR,_
+qFinishL,_,<
+
+qFinishL,#
+qFinishL,#,<
+
+qFinishL,_
+qGood,_,-
